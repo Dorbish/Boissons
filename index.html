@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Boissons</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #e94560;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+        }
+
+        /* STATS */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 10px 18px;
+            text-align: center;
+            border: 1px solid #0f3460;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .stat-box .number {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .stat-box .label {
+            font-size: 0.7rem;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        .stat-box.rupture .number { color: #e94560; }
+        .stat-box.dispo .number { color: #4ecca3; }
+        .stat-box.total .number { color: #f5a623; }
+
+        /* ONGLETS */
+        .tabs-container {
+            display: flex;
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 10px;
+            border-radius: 9px;
+            border: none;
+            background: transparent;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.25s;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .tab-btn.active {
+            background: #e94560;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(233,69,96,0.4);
+        }
+
+        .tab-btn.stock-tab.active {
+            background: #4ecca3;
+            color: #1a1a2e;
+            box-shadow: 0 2px 10px rgba(78,204,163,0.4);
+        }
+
+        .tab-btn .tab-icon {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* CONTENU ONGLETS */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* TOOLBAR */
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #0f3460;
+            background: #16213e;
+            color: #eee;
+            font-size: 0.9rem;
+            outline: none;
+            min-width: 0;
+        }
+
+        .search-bar:focus {
+            border-color: #e94560;
+        }
+
+        .filter-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .filter-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #0f3460;
+            background: #16213e;
+            color: #eee;
+            cursor: pointer;
+            font-size: 0.78rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: #e94560;
+            border-color: #e94560;
+        }
+
+        /* BOUTONS ACTION */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .save-btn {
+            flex: 1;
+            padding: 11px;
+            border-radius: 8px;
+            border: none;
+            background: #4ecca3;
+            color: #1a1a2e;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .save-btn:hover { background: #3ab890; }
+
+        .reset-btn {
+            flex: 1;
+            padding: 11px;
+            border-radius: 8px;
+            border: none;
+            background: #e94560;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover { background: #c73652; }
+
+        /* TABLE */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #16213e;
+        }
+
+        thead {
+            background: #0f3460;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        thead th {
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ccc;
+        }
+
+        thead th:nth-child(2) {
+            text-align: center;
+        }
+
+        thead th:nth-child(3) {
+            text-align: center;
+        }
+
+        .category-row td {
+            background: #0f3460;
+            color: #f5a623;
+            font-weight: bold;
+            font-size: 0.82rem;
+            padding: 7px 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tbody tr:not(.category-row) {
+            border-bottom: 1px solid #1e2d50;
+            transition: background 0.15s;
+        }
+
+        tbody tr:not(.category-row):hover {
+            background: #1e2d50;
+        }
+
+        tbody td {
+            padding: 9px 10px;
+            font-size: 0.88rem;
+        }
+
+        tbody td:nth-child(2) {
+            text-align: center;
+        }
+
+        tbody td:nth-child(3) {
+            text-align: center;
+        }
+
+        .qty-input {
+            width: 65px;
+            padding: 8px 6px;
+            border-radius: 6px;
+            border: 2px solid #0f3460;
+            background: #1a1a2e;
+            color: #eee;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: border 0.2s;
+            -moz-appearance: textfield;
+        }
+
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        .qty-input.vitrine-input:focus {
+            border-color: #f5a623;
+            background: #16213e;
+        }
+
+        .qty-input.stock-input:focus {
+            border-color: #4ecca3;
+            background: #16213e;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .badge.rupture {
+            background: rgba(233, 69, 96, 0.2);
+            color: #e94560;
+            border: 1px solid #e94560;
+        }
+
+        .badge.dispo {
+            background: rgba(78, 204, 163, 0.2);
+            color: #4ecca3;
+            border: 1px solid #4ecca3;
+        }
+
+        .hint {
+            text-align: center;
+            color: #555;
+            font-size: 0.75rem;
+            margin-top: 12px;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #4ecca3;
+            color: #1a1a2e;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.88rem;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* BADGE ONGLET */
+        .tab-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.25);
+            border-radius: 10px;
+            padding: 1px 7px;
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🥤 Boissons</h1>
+<p class="subtitle">Gestion stock & vitrine</p>
+
+<div class="stats-bar">
+    <div class="stat-box total">
+        <div class="number" id="stat-total">0</div>
+        <div class="label">Produits</div>
+    </div>
+    <div class="stat-box dispo">
+        <div class="number" id="stat-dispo">0</div>
+        <div class="label">Dispo</div>
+    </div>
+    <div class="stat-box rupture">
+        <div class="number" id="stat-rupture">0</div>
+        <div class="label">Ruptures</div>
+    </div>
+</div>
+
+<!-- ONGLETS -->
+<div class="tabs-container">
+    <button class="tab-btn active" onclick="switchTab('vitrine', this)">
+        <span class="tab-icon">🏪</span>
+        Vitrine<br>
+        <small style="font-weight:normal;font-size:0.7rem;">Équipiers</small>
+    </button>
+    <button class="tab-btn stock-tab" onclick="switchTab('stock', this)">
+        <span class="tab-icon">📦</span>
+        Stock<br>
+        <small style="font-weight:normal;font-size:0.7rem;">Responsable</small>
+    </button>
+</div>
+
+<!-- ONGLET VITRINE -->
+<div class="tab-content active" id="tab-vitrine">
+    <div class="toolbar">
+        <input type="text" class="search-bar" id="search-vitrine" placeholder="🔍 Rechercher...">
+        <div class="filter-btns">
+            <button class="filter-btn active" onclick="setFilter('vitrine', 'all', this)">Tous</button>
+            <button class="filter-btn" onclick="setFilter('vitrine', 'rupture', this)">Ruptures</button>
+            <button class="filter-btn" onclick="setFilter('vitrine', 'dispo', this)">Dispo</button>
+        </div>
+    </div>
+    <div class="table-wrapper">
+        <table id="table-vitrine">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th style="color:#f5a623;">Qté Vitrine</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-vitrine"></tbody>
+        </table>
+    </div>
+    <p class="hint">💡 Entrée = produit suivant dans la même colonne</p>
+</div>
+
+<!-- ONGLET STOCK -->
+<div class="tab-content" id="tab-stock">
+    <div class="toolbar">
+        <input type="text" class="search-bar" id="search-stock" placeholder="🔍 Rechercher...">
+        <div class="filter-btns">
+            <button class="filter-btn active" onclick="setFilter('stock', 'all', this)">Tous</button>
+            <button class="filter-btn" onclick="setFilter('stock', 'rupture', this)">Ruptures</button>
+            <button class="filter-btn" onclick="setFilter('stock', 'dispo', this)">Dispo</button>
+        </div>
+    </div>
+    <div class="action-btns">
+        <button class="reset-btn" onclick="resetAll()">↺ Réinitialiser</button>
+        <button class="save-btn" onclick="saveData()">💾 Sauvegarder</button>
+    </div>
+    <div class="table-wrapper">
+        <table id="table-stock">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th style="color:#4ecca3;">Qté Stock</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-stock"></tbody>
+        </table>
+    </div>
+    <p class="hint">💡 Entrée = produit suivant dans la même colonne</p>
+</div>
+
+<div class="toast" id="toast">✅ Sauvegardé !</div>
+
+<script>
+    const categories = [
+        {
+            name: "Bouteilles Plates",
+            products: [
+                { name: "Volvic Citron",        vitrine: 0,  stock: 0  },
+                { name: "Volvic Fraise",         vitrine: 0,  stock: 0  },
+                { name: "Volvic Pamplemousse",   vitrine: 2,  stock: 2  },
+                { name: "Volvic Fruit",          vitrine: 1,  stock: 1  },
+                { name: "Caprisun",              vitrine: 0,  stock: 0  },
+                { name: "Minute Maid Bout.",     vitrine: 0,  stock: 0  },
+                { name: "Vittel",                vitrine: 0,  stock: 0  },
+                { name: "Christaline 1.5L",      vitrine: 0,  stock: 0  },
+                { name: "Christaline 0.5L",      vitrine: 40, stock: 40 },
+            ]
+        },
+        {
+            name: "Eaux Pétillantes",
+            products: [
+                { name: "Perrier",               vitrine: 6,  stock: 6  },
+                { name: "Perrier Citron Can",     vitrine: 0,  stock: 0  },
+                { name: "Christaline Pétillante", vitrine: 2,  stock: 2  },
+                { name: "San Pellegrino Orange",  vitrine: 3,  stock: 3  },
+                { name: "San Pellegrino Citron",  vitrine: 1,  stock: 1  },
+                { name: "San Pellegrino Bout.",   vitrine: 0,  stock: 0  },
+                { name: "Badoit Citron",          vitrine: 2,  stock: 2  },
+            ]
+        },
+        {
+            name: "Sodas Bouteilles",
+            products: [
+                { name: "Coca-Cola",             vitrine: 0,  stock: 0  },
+                { name: "Coca-Cola Zéro",        vitrine: 0,  stock: 0  },
+                { name: "Coca-Cola Cherry",      vitrine: 4,  stock: 4  },
+                { name: "Orangina",              vitrine: 0,  stock: 0  },
+                { name: "Fuze Tea",              vitrine: 3,  stock: 3  },
+                { name: "Fuze Tea Framboise",    vitrine: 2,  stock: 2  },
+                { name: "Oasis",                 vitrine: 7,  stock: 7  },
+                { name: "Pulco",                 vitrine: 5,  stock: 5  },
+                { name: "Schweppes",             vitrine: 6,  stock: 6  },
+                { name: "Sprite",                vitrine: 1,  stock: 1  },
+                { name: "Fanta",                 vitrine: 5,  stock: 5  },
+            ]
+        },
+        {
+            name: "Sodas Canettes",
+            products: [
+                { name: "Coca-Cola Can",         vitrine: 4,  stock: 4  },
+                { name: "Coca-Cola Zéro Can",    vitrine: 0,  stock: 0  },
+                { name: "Orangina Can",          vitrine: 5,  stock: 5  },
+                { name: "Schweppes Can",         vitrine: 3,  stock: 3  },
+                { name: "Schweppes Zéro Can",    vitrine: 5,  stock: 5  },
+                { name: "Sprite Can",            vitrine: 5,  stock: 5  },
+                { name: "Fuze Tea Can",          vitrine: 5,  stock: 5  },
+                { name: "Oasis Can",             vitrine: 1,  stock: 1  },
+            ]
+        },
+        {
+            name: "Jus & Nectars",
+            products: [
+                { name: "Lorina Pêche",          vitrine: 2,  stock: 2  },
+                { name: "Lorina Grenade",        vitrine: 1,  stock: 1  },
+                { name: "Lorina",                vitrine: 0,  stock: 0  },
+                { name: "Minute Maid Multi",     vitrine: 0,  stock: 0  },
+                { name: "Minute Maid Pomme",     vitrine: 0,  stock: 0  },
+                { name: "Minute Maid Orange",    vitrine: 0,  stock: 0  },
+                { name: "Soofy Mojito",          vitrine: 1,  stock: 1  },
+                { name: "Soofy Lychee",          vitrine: 0,  stock: 0  },
+            ]
+        }
+    ];
+
+    // Chaque produit a sa rupture calculée depuis le stock
+    categories.forEach(cat => cat.products.forEach(p => {
+        p.rupture = p.stock <= 0;
+    }));
+
+    let filters = { vitrine: 'all', stock: 'all' };
+    let vitrineInputsList = [];
+    let stockInputsList = [];
+
+    // ─── CHARGEMENT LOCAL STORAGE ───────────────────────────────────────────
+    function loadData() {
+        const saved = localStorage.getItem('boissons_v2');
+        if (!saved) return;
+        const data = JSON.parse(saved);
+        categories.forEach(cat => cat.products.forEach(p => {
+            if (data[p.name]) {
+                p.vitrine = data[p.name].vitrine;
+                p.stock   = data[p.name].stock;
+                p.rupture = p.stock <= 0;
+            }
+        }));
+    }
+
+    function saveData() {
+        const data = {};
+        categories.forEach(cat => cat.products.forEach(p => {
+            data[p.name] = { vitrine: p.vitrine, stock: p.stock };
+        }));
+        localStorage.setItem('boissons_v2', JSON.stringify(data));
+        showToast('✅ Sauvegardé !');
+    }
+
+    function resetAll() {
+        if (!confirm('Remettre toutes les quantités à 0 ?')) return;
+        categories.forEach(cat => cat.products.forEach(p => {
+            p.vitrine = 0; p.stock = 0; p.rupture = true;
+        }));
+        renderBothTables();
+        updateStats();
+        showToast('🔄 Réinitialisé !');
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ─── ONGLETS ─────────────────────────────────────────────────────────────
+    function switchTab(tab, btn) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // ─── STATS ────────────────────────────────────────────────────────────────
+    function updateStats() {
+        let total = 0, rupture = 0, dispo = 0;
+        categories.forEach(cat => cat.products.forEach(p => {
+            total++;
+            p.rupture ? rupture++ : dispo++;
+        }));
+        document.getElementById('stat-total').textContent   = total;
+        document.getElementById('stat-rupture').textContent = rupture;
+        document.getElementById('stat-dispo').textContent   = dispo;
+    }
+
+    // ─── FILTRES ──────────────────────────────────────────────────────────────
+    function setFilter(tab, filter, btn) {
+        filters[tab] = filter;
+        const container = document.getElementById('tab-' + tab);
+        container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter(tab);
+    }
+
+    function applyFilter(tab) {
+        const search  = document.getElementById('search-' + tab).value.toLowerCase();
+        const filter  = filters[tab];
+        const tbody   = document.getElementById('tbody-' + tab);
+        const rows    = tbody.querySelectorAll('tr');
+
+        let lastCatRow = null;
+        let lastCatHasVisible = false;
+
+        rows.forEach(row => {
+            if (row.classList.contains('category-row')) {
+                if (lastCatRow) lastCatRow.style.display = lastCatHasVisible ? '' : 'none';
+                lastCatRow = row;
+                lastCatHasVisible = false;
+                return;
+            }
+            const name      = (row.dataset.name || '').toLowerCase();
+            const isRupture = row.dataset.rupture === 'true';
+            let visible = true;
+            if (search && !name.includes(search)) visible = false;
+            if (filter === 'rupture' && !isRupture)  visible = false;
+            if (filter === 'dispo'   && isRupture)   visible = false;
+            row.style.display = visible ? '' : 'none';
+            if (visible) lastCatHasVisible = true;
+        });
+        if (lastCatRow) lastCatRow.style.display = lastCatHasVisible ? '' : 'none';
+    }
+
+    // ─── BADGE ID ─────────────────────────────────────────────────────────────
+    function badgeId(name, tab) {
+        return `badge-${tab}-${name.replace(/\s+/g,'-').replace(/[^a-zA-Z0-9-]/g,'')}`;
+    }
+
+    // ─── MISE À JOUR BADGE ────────────────────────────────────────────────────
+    function refreshBadges(p) {
+        ['vitrine','stock'].forEach(tab => {
+            const el = document.getElementById(badgeId(p.name, tab));
+            if (!el) return;
+            el.className = `badge ${p.rupture ? 'rupture' : 'dispo'}`;
+            el.textContent = p.rupture ? 'Rupture' : 'Disponible';
+        });
+        // Mettre à jour data-rupture sur les lignes des deux tableaux
+        ['vitrine','stock'].forEach(tab => {
+            const tbody = document.getElementById('tbody-' + tab);
+            tbody.querySelectorAll(`tr[data-name="${p.name}"]`).forEach(tr => {
+                tr.dataset.rupture = p.rupture ? 'true' : 'false';
+            });
+        });
+    }
+
+    // ─── RENDER ───────────────────────────────────────────────────────────────
+    function renderBothTables() {
+        vitrineInputsList = [];
+        stockInputsList   = [];
+
+        const tbodyV = document.getElementById('tbody-vitrine');
+        const tbodyS = document.getElementById('tbody-stock');
+        tbodyV.innerHTML = '';
+        tbodyS.innerHTML = '';
+
+        categories.forEach(cat => {
+            // Ligne catégorie vitrine
+            const catV = document.createElement('tr');
+            catV.classList.add('category-row');
+            catV.innerHTML = `<td colspan="3">📦 ${cat.name}</td>`;
+            tbodyV.appendChild(catV);
+
+            // Ligne catégorie stock
+            const catS = document.createElement('tr');
+            catS.classList.add('category-row');
+            catS.innerHTML = `<td colspan="3">📦 ${cat.name}</td>`;
+            tbodyS.appendChild(catS);
+
+            cat.products.forEach(p => {
+                const rupClass  = p.rupture ? 'rupture' : 'dispo';
+                const rupText   = p.rupture ? 'Rupture' : 'Disponible';
+
+                // ── Ligne VITRINE ──
+                const trV = document.createElement('tr');
+                trV.dataset.name    = p.name;
+                trV.dataset.rupture = p.rupture ? 'true' : 'false';
+                trV.innerHTML = `
+                    <td>${p.name}</td>
+                    <td><input type="number" class="qty-input vitrine-input" value="${p.vitrine}" min="0" inputmode="numeric"></td>
+                    <td><span class="badge ${rupClass}" id="${badgeId(p.name,'vitrine')}">${rupText}</span></td>
+                `;
+                tbodyV.appendChild(trV);
+
+                // ── Ligne STOCK ──
+                const trS = document.createElement('tr');
+                trS.dataset.name    = p.name;
+                trS.dataset.rupture = p.rupture ? 'true' : 'false';
+                trS.innerHTML = `
+                    <td>${p.name}</td>
+                    <td><input type="number" class="qty-input stock-input" value="${p.stock}" min="0" inputmode="numeric"></td>
+                    <td><span class="badge ${rupClass}" id="${badgeId(p.name,'stock')}">${rupText}</span></td>
+                `;
+                tbodyS.appendChild(trS);
+
+                const vitrineInput = trV.querySelector('.vitrine-input');
+                const stockInput   = trS.querySelector('.stock-input');
+
+                vitrineInputsList.push(vitrineInput);
+                stockInputsList.push(stockInput);
+
+                // ── Événements VITRINE ──
+                vitrineInput.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = Math.max(0, parseInt(vitrineInput.value) || 0);
+                        vitrineInput.value = val;
+                        p.vitrine = val;
+                        focusNext(vitrineInputsList, vitrineInput);
+                    }
+                });
+                vitrineInput.addEventListener('change', () => {
+                    p.vitrine = Math.max(0, parseInt(vitrineInput.value) || 0);
+                    vitrineInput.value = p.vitrine;
+                });
+                vitrineInput.addEventListener('focus', () => vitrineInput.select());
+
+                // ── Événements STOCK ──
+                stockInput.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = Math.max(0, parseInt(stockInput.value) || 0);
+                        stockInput.value = val;
+                        p.stock   = val;
+                        p.rupture = val <= 0;
+                        refreshBadges(p);
+                        updateStats();
+                        focusNext(stockInputsList, stockInput);
+                    }
+                });
+                stockInput.addEventListener('change', () => {
+                    p.stock   = Math.max(0, parseInt(stockInput.value) || 0);
+                    stockInput.value = p.stock;
+                    p.rupture = p.stock <= 0;
+                    refreshBadges(p);
+                    updateStats();
+                });
+                stockInput.addEventListener('focus', () => stockInput.select());
+            });
+        });
+
+        applyFilter('vitrine');
+        applyFilter('stock');
+        updateStats();
+    }
+
+    // ─── NAVIGATION ──────────────────────────────────────────────────────────
+    function focusNext(list, current) {
+        const idx = list.indexOf(current);
+        for (let i = idx + 1; i < list.length; i++) {
+            const next = list[i];
+            if (next.closest('tr').style.display !== 'none') {
+                next.focus();
+                next.select();
+                break;
+            }
+        }
+    }
+
+    // ─── INIT ─────────────────────────────────────────────────────────────────
+    loadData();
+    renderBothTables();
+
+    document.getElementById('search-vitrine').addEventListener('input', () => applyFilter('vitrine'));
+    document.getElementById('search-stock').addEventListener('input',   () => applyFilter('stock'));
+</script>
+
+</body>
+</html>
