@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Boissons</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background: #1a1a2e;
             color: #eee;
             min-height: 100vh;
@@ -35,13 +31,11 @@
             font-size: 0.8rem;
         }
 
-        /* STATS */
         .stats-bar {
             display: flex;
             justify-content: center;
             gap: 12px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
         }
 
         .stat-box {
@@ -51,25 +45,14 @@
             text-align: center;
             border: 1px solid #0f3460;
             flex: 1;
-            min-width: 80px;
         }
 
-        .stat-box .number {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .stat-box .label {
-            font-size: 0.7rem;
-            color: #aaa;
-            text-transform: uppercase;
-        }
-
+        .stat-box .number { font-size: 1.5rem; font-weight: bold; }
+        .stat-box .label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
         .stat-box.rupture .number { color: #e94560; }
         .stat-box.dispo .number { color: #4ecca3; }
         .stat-box.total .number { color: #f5a623; }
 
-        /* ONGLETS */
         .tabs-container {
             display: flex;
             background: #0f3460;
@@ -106,663 +89,502 @@
             box-shadow: 0 2px 10px rgba(78,204,163,0.4);
         }
 
-        .tab-btn .tab-icon {
-            font-size: 1.2rem;
-            display: block;
-            margin-bottom: 3px;
-        }
+        .tab-btn .tab-icon { font-size: 1.2rem; display: block; margin-bottom: 2px; }
 
-        /* CONTENU ONGLETS */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* TOOLBAR */
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .panel { display: none; }
+        .panel.active { display: block; }
 
         .search-bar {
-            flex: 1;
+            width: 100%;
             padding: 10px 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #0f3460;
             background: #16213e;
             color: #eee;
             font-size: 0.9rem;
+            margin-bottom: 15px;
             outline: none;
-            min-width: 0;
-        }
-
-        .search-bar:focus {
-            border-color: #e94560;
         }
 
         .filter-btns {
-            display: flex;
-            gap: 6px;
-        }
-
-        .filter-btn {
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid #0f3460;
-            background: #16213e;
-            color: #eee;
-            cursor: pointer;
-            font-size: 0.78rem;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .filter-btn.active, .filter-btn:hover {
-            background: #e94560;
-            border-color: #e94560;
-        }
-
-        /* BOUTONS ACTION */
-        .action-btns {
             display: flex;
             gap: 8px;
             margin-bottom: 15px;
         }
 
-        .save-btn {
+        .filter-btn {
             flex: 1;
-            padding: 11px;
+            padding: 8px;
             border-radius: 8px;
-            border: none;
-            background: #4ecca3;
-            color: #1a1a2e;
+            border: 1px solid #0f3460;
+            background: #16213e;
+            color: #aaa;
             cursor: pointer;
+            font-size: 0.75rem;
             font-weight: bold;
-            font-size: 0.85rem;
             transition: all 0.2s;
         }
 
-        .save-btn:hover { background: #3ab890; }
-
-        .reset-btn {
-            flex: 1;
-            padding: 11px;
-            border-radius: 8px;
-            border: none;
-            background: #e94560;
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .reset-btn:hover { background: #c73652; }
-
-        /* TABLE */
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 12px;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.4);
-        }
+        .filter-btn.active-filter { background: #0f3460; color: #fff; }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #16213e;
         }
 
-        thead {
+        th {
             background: #0f3460;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        thead th {
-            padding: 12px 10px;
-            text-align: left;
-            font-size: 0.78rem;
+            padding: 10px 8px;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #ccc;
+            color: #aaa;
+            text-align: left;
         }
 
-        thead th:nth-child(2) {
-            text-align: center;
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #16213e;
+            font-size: 0.85rem;
+            vertical-align: middle;
         }
 
-        thead th:nth-child(3) {
-            text-align: center;
-        }
+        tr:hover td { background: #16213e55; }
 
         .category-row td {
             background: #0f3460;
-            color: #f5a623;
+            color: #4ecca3;
             font-weight: bold;
-            font-size: 0.82rem;
-            padding: 7px 10px;
-            text-transform: uppercase;
+            font-size: 0.8rem;
             letter-spacing: 1px;
-        }
-
-        tbody tr:not(.category-row) {
-            border-bottom: 1px solid #1e2d50;
-            transition: background 0.15s;
-        }
-
-        tbody tr:not(.category-row):hover {
-            background: #1e2d50;
-        }
-
-        tbody td {
-            padding: 9px 10px;
-            font-size: 0.88rem;
-        }
-
-        tbody td:nth-child(2) {
-            text-align: center;
-        }
-
-        tbody td:nth-child(3) {
-            text-align: center;
-        }
-
-        .qty-input {
-            width: 65px;
-            padding: 8px 6px;
-            border-radius: 6px;
-            border: 2px solid #0f3460;
-            background: #1a1a2e;
-            color: #eee;
-            font-size: 1rem;
-            text-align: center;
-            outline: none;
-            transition: border 0.2s;
-            -moz-appearance: textfield;
-        }
-
-        .qty-input::-webkit-outer-spin-button,
-        .qty-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-        }
-
-        .qty-input.vitrine-input:focus {
-            border-color: #f5a623;
-            background: #16213e;
-        }
-
-        .qty-input.stock-input:focus {
-            border-color: #4ecca3;
-            background: #16213e;
+            padding: 8px 10px;
         }
 
         .badge {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 20px;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             white-space: nowrap;
         }
 
-        .badge.rupture {
-            background: rgba(233, 69, 96, 0.2);
+        .badge.rupture { background: #e9456022; color: #e94560; border: 1px solid #e94560; }
+        .badge.dispo   { background: #4ecca322; color: #4ecca3; border: 1px solid #4ecca3; }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            border: none;
+            background: #0f3460;
+            color: #eee;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .qty-btn:active { background: #e94560; }
+
+        .qty-input {
+            width: 45px;
+            text-align: center;
+            background: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 7px;
+            color: #eee;
+            font-size: 0.95rem;
+            padding: 5px 2px;
+            -moz-appearance: textfield;
+        }
+
+        .qty-input::-webkit-inner-spin-button,
+        .qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+        .name-col { min-width: 130px; }
+
+        .reset-btn {
+            display: block;
+            margin: 25px auto 0;
+            padding: 10px 30px;
+            background: #e9456033;
             color: #e94560;
             border: 1px solid #e94560;
-        }
-
-        .badge.dispo {
-            background: rgba(78, 204, 163, 0.2);
-            color: #4ecca3;
-            border: 1px solid #4ecca3;
-        }
-
-        .hint {
-            text-align: center;
-            color: #555;
-            font-size: 0.75rem;
-            margin-top: 12px;
-        }
-
-        /* TOAST */
-        .toast {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: #4ecca3;
-            color: #1a1a2e;
-            padding: 12px 25px;
             border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
             font-weight: bold;
-            font-size: 0.88rem;
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 1000;
-            white-space: nowrap;
         }
 
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* BADGE ONGLET */
-        .tab-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.25);
-            border-radius: 10px;
-            padding: 1px 7px;
-            font-size: 0.7rem;
-            margin-left: 4px;
-        }
+        .reset-btn:active { background: #e94560; color: #fff; }
     </style>
 </head>
 <body>
 
-<h1>🥤 Boissons</h1>
-<p class="subtitle">Gestion stock & vitrine</p>
+<h1>🥤 Gestion des Boissons</h1>
+<p class="subtitle">Mise à jour en temps réel</p>
 
 <div class="stats-bar">
     <div class="stat-box total">
         <div class="number" id="stat-total">0</div>
         <div class="label">Produits</div>
     </div>
-    <div class="stat-box dispo">
-        <div class="number" id="stat-dispo">0</div>
-        <div class="label">Dispo</div>
-    </div>
     <div class="stat-box rupture">
         <div class="number" id="stat-rupture">0</div>
         <div class="label">Ruptures</div>
     </div>
+    <div class="stat-box dispo">
+        <div class="number" id="stat-dispo">0</div>
+        <div class="label">Disponibles</div>
+    </div>
 </div>
 
-<!-- ONGLETS -->
 <div class="tabs-container">
-    <button class="tab-btn active" onclick="switchTab('vitrine', this)">
-        <span class="tab-icon">🏪</span>
-        Vitrine<br>
-        <small style="font-weight:normal;font-size:0.7rem;">Équipiers</small>
+    <button class="tab-btn active" id="tab-vitrine" onclick="switchTab('vitrine')" data-filter="all">
+        <span class="tab-icon">🪟</span>Vitrine<br><small style="font-weight:normal;color:inherit">Équipiers</small>
     </button>
-    <button class="tab-btn stock-tab" onclick="switchTab('stock', this)">
-        <span class="tab-icon">📦</span>
-        Stock<br>
-        <small style="font-weight:normal;font-size:0.7rem;">Responsable</small>
+    <button class="tab-btn stock-tab" id="tab-stock" onclick="switchTab('stock')" data-filter="all">
+        <span class="tab-icon">📦</span>Stock<br><small style="font-weight:normal;color:inherit">Responsable</small>
     </button>
 </div>
 
-<!-- ONGLET VITRINE -->
-<div class="tab-content active" id="tab-vitrine">
-    <div class="toolbar">
-        <input type="text" class="search-bar" id="search-vitrine" placeholder="🔍 Rechercher...">
-        <div class="filter-btns">
-            <button class="filter-btn active" onclick="setFilter('vitrine', 'all', this)">Tous</button>
-            <button class="filter-btn" onclick="setFilter('vitrine', 'rupture', this)">Ruptures</button>
-            <button class="filter-btn" onclick="setFilter('vitrine', 'dispo', this)">Dispo</button>
-        </div>
+<!-- PANEL VITRINE -->
+<div class="panel active" id="panel-vitrine">
+    <input class="search-bar" id="search-vitrine" type="text" placeholder="🔍 Rechercher une boisson...">
+    <div class="filter-btns">
+        <button class="filter-btn active-filter" onclick="setFilter('vitrine','all',this)">Tous</button>
+        <button class="filter-btn" onclick="setFilter('vitrine','rupture',this)">Ruptures</button>
+        <button class="filter-btn" onclick="setFilter('vitrine','dispo',this)">Disponibles</button>
     </div>
-    <div class="table-wrapper">
-        <table id="table-vitrine">
-            <thead>
-                <tr>
-                    <th>Produit</th>
-                    <th style="color:#f5a623;">Qté Vitrine</th>
-                    <th>Statut</th>
-                </tr>
-            </thead>
-            <tbody id="tbody-vitrine"></tbody>
-        </table>
-    </div>
-    <p class="hint">💡 Entrée = produit suivant dans la même colonne</p>
+    <table>
+        <thead>
+            <tr>
+                <th class="name-col">Produit</th>
+                <th>Qté Vitrine</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-vitrine"></tbody>
+    </table>
 </div>
 
-<!-- ONGLET STOCK -->
-<div class="tab-content" id="tab-stock">
-    <div class="toolbar">
-        <input type="text" class="search-bar" id="search-stock" placeholder="🔍 Rechercher...">
-        <div class="filter-btns">
-            <button class="filter-btn active" onclick="setFilter('stock', 'all', this)">Tous</button>
-            <button class="filter-btn" onclick="setFilter('stock', 'rupture', this)">Ruptures</button>
-            <button class="filter-btn" onclick="setFilter('stock', 'dispo', this)">Dispo</button>
-        </div>
+<!-- PANEL STOCK -->
+<div class="panel" id="panel-stock">
+    <input class="search-bar" id="search-stock" type="text" placeholder="🔍 Rechercher une boisson...">
+    <div class="filter-btns">
+        <button class="filter-btn active-filter" onclick="setFilter('stock','all',this)">Tous</button>
+        <button class="filter-btn" onclick="setFilter('stock','rupture',this)">Ruptures</button>
+        <button class="filter-btn" onclick="setFilter('stock','dispo',this)">Disponibles</button>
     </div>
-    <div class="action-btns">
-        <button class="reset-btn" onclick="resetAll()">↺ Réinitialiser</button>
-        <button class="save-btn" onclick="saveData()">💾 Sauvegarder</button>
-    </div>
-    <div class="table-wrapper">
-        <table id="table-stock">
-            <thead>
-                <tr>
-                    <th>Produit</th>
-                    <th style="color:#4ecca3;">Qté Stock</th>
-                    <th>Statut</th>
-                </tr>
-            </thead>
-            <tbody id="tbody-stock"></tbody>
-        </table>
-    </div>
-    <p class="hint">💡 Entrée = produit suivant dans la même colonne</p>
+    <table>
+        <thead>
+            <tr>
+                <th class="name-col">Produit</th>
+                <th>Qté Stock</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-stock"></tbody>
+    </table>
+    <button class="reset-btn" onclick="resetAll()">🔄 Remettre tout à zéro</button>
 </div>
-
-<div class="toast" id="toast">✅ Sauvegardé !</div>
 
 <script>
-    const categories = [
+    // ─── DONNÉES ──────────────────────────────────────────────────────────────
+
+    const ordreVitrine = [
+        "Volvic Citron", "Volvic Fraise", "Volvic Pamplemousse", "Volvic Fruit Exotique",
+        "Caprisun", "Minute Maid",
+        "Lorina Pêche", "Lorina Grenade", "Lorina",
+        "Coca", "Coca Zéro", "Coca Cherry",
+        "Orangina",
+        "Fuze Tea", "Fuze Tea Framboise",
+        "Oasis", "Pulco", "Schweppes", "Sprite", "Fanta",
+        "Coca can", "Coca Zéro can", "Orangina can",
+        "Schweppes can", "Schweppes Zéro can", "Sprite can", "Fuze Tea can", "Oasis can",
+        "Minute Maid Multi can", "Minute Maid Pomme can", "Minute Maid Orange can",
+        "San Pellegrino Orange can", "San Pellegrino Citron can",
+        "Soofy Mojito can", "Soofy Litchi can",
+        "Perrier citron can",
+        "Christaline 1.5L", "Vittel", "Christaline 0.5L",
+        "Christaline Pétillante", "Perrier", "San Pellegrino", "Badoit Citron"
+    ];
+
+    const categoriesStock = [
         {
-            name: "Bouteilles Plates",
+            name: "Eaux Plates",
             products: [
-                { name: "Volvic Citron",        vitrine: 0,  stock: 0  },
-                { name: "Volvic Fraise",         vitrine: 0,  stock: 0  },
-                { name: "Volvic Pamplemousse",   vitrine: 2,  stock: 2  },
-                { name: "Volvic Fruit",          vitrine: 1,  stock: 1  },
-                { name: "Caprisun",              vitrine: 0,  stock: 0  },
-                { name: "Minute Maid Bout.",     vitrine: 0,  stock: 0  },
-                { name: "Vittel",                vitrine: 0,  stock: 0  },
-                { name: "Christaline 1.5L",      vitrine: 0,  stock: 0  },
-                { name: "Christaline 0.5L",      vitrine: 40, stock: 40 },
+                "Christaline 1.5L", "Christaline 0.5L", "Vittel",
+                "Volvic Citron", "Volvic Fraise", "Volvic Pamplemousse", "Volvic Fruit Exotique"
             ]
         },
         {
             name: "Eaux Pétillantes",
             products: [
-                { name: "Perrier",               vitrine: 6,  stock: 6  },
-                { name: "Perrier Citron Can",     vitrine: 0,  stock: 0  },
-                { name: "Christaline Pétillante", vitrine: 2,  stock: 2  },
-                { name: "San Pellegrino Orange",  vitrine: 3,  stock: 3  },
-                { name: "San Pellegrino Citron",  vitrine: 1,  stock: 1  },
-                { name: "San Pellegrino Bout.",   vitrine: 0,  stock: 0  },
-                { name: "Badoit Citron",          vitrine: 2,  stock: 2  },
+                "Christaline Pétillante", "Perrier", "San Pellegrino", "Badoit Citron"
             ]
         },
         {
             name: "Sodas Bouteilles",
             products: [
-                { name: "Coca-Cola",             vitrine: 0,  stock: 0  },
-                { name: "Coca-Cola Zéro",        vitrine: 0,  stock: 0  },
-                { name: "Coca-Cola Cherry",      vitrine: 4,  stock: 4  },
-                { name: "Orangina",              vitrine: 0,  stock: 0  },
-                { name: "Fuze Tea",              vitrine: 3,  stock: 3  },
-                { name: "Fuze Tea Framboise",    vitrine: 2,  stock: 2  },
-                { name: "Oasis",                 vitrine: 7,  stock: 7  },
-                { name: "Pulco",                 vitrine: 5,  stock: 5  },
-                { name: "Schweppes",             vitrine: 6,  stock: 6  },
-                { name: "Sprite",                vitrine: 1,  stock: 1  },
-                { name: "Fanta",                 vitrine: 5,  stock: 5  },
+                "Coca", "Coca Zéro", "Coca Cherry",
+                "Orangina",
+                "Fuze Tea", "Fuze Tea Framboise",
+                "Oasis", "Pulco", "Schweppes", "Sprite", "Fanta",
+                "Lorina", "Lorina Pêche", "Lorina Grenade"
             ]
         },
         {
             name: "Sodas Canettes",
             products: [
-                { name: "Coca-Cola Can",         vitrine: 4,  stock: 4  },
-                { name: "Coca-Cola Zéro Can",    vitrine: 0,  stock: 0  },
-                { name: "Orangina Can",          vitrine: 5,  stock: 5  },
-                { name: "Schweppes Can",         vitrine: 3,  stock: 3  },
-                { name: "Schweppes Zéro Can",    vitrine: 5,  stock: 5  },
-                { name: "Sprite Can",            vitrine: 5,  stock: 5  },
-                { name: "Fuze Tea Can",          vitrine: 5,  stock: 5  },
-                { name: "Oasis Can",             vitrine: 1,  stock: 1  },
+                "Coca can", "Coca Zéro can", "Orangina can",
+                "Schweppes can", "Schweppes Zéro can", "Sprite can",
+                "Fuze Tea can", "Oasis can",
+                "Soofy Mojito can", "Soofy Litchi can",
+                "Perrier citron can",
+                "San Pellegrino Orange can", "San Pellegrino Citron can"
             ]
         },
         {
             name: "Jus & Nectars",
             products: [
-                { name: "Lorina Pêche",          vitrine: 2,  stock: 2  },
-                { name: "Lorina Grenade",        vitrine: 1,  stock: 1  },
-                { name: "Lorina",                vitrine: 0,  stock: 0  },
-                { name: "Minute Maid Multi",     vitrine: 0,  stock: 0  },
-                { name: "Minute Maid Pomme",     vitrine: 0,  stock: 0  },
-                { name: "Minute Maid Orange",    vitrine: 0,  stock: 0  },
-                { name: "Soofy Mojito",          vitrine: 1,  stock: 1  },
-                { name: "Soofy Lychee",          vitrine: 0,  stock: 0  },
+                "Minute Maid", "Caprisun",
+                "Minute Maid Multi can", "Minute Maid Pomme can", "Minute Maid Orange can"
             ]
         }
     ];
 
-    // Chaque produit a sa rupture calculée depuis le stock
-    categories.forEach(cat => cat.products.forEach(p => {
-        p.rupture = p.stock <= 0;
-    }));
+    // ─── STATE ────────────────────────────────────────────────────────────────
 
-    let filters = { vitrine: 'all', stock: 'all' };
+    let products = {};
     let vitrineInputsList = [];
-    let stockInputsList = [];
+    let stockInputsList   = [];
 
-    // ─── CHARGEMENT LOCAL STORAGE ───────────────────────────────────────────
     function loadData() {
-        const saved = localStorage.getItem('boissons_v2');
-        if (!saved) return;
-        const data = JSON.parse(saved);
-        categories.forEach(cat => cat.products.forEach(p => {
-            if (data[p.name]) {
-                p.vitrine = data[p.name].vitrine;
-                p.stock   = data[p.name].stock;
-                p.rupture = p.stock <= 0;
+        const saved = localStorage.getItem("boissons_v5");
+        if (saved) {
+            products = JSON.parse(saved);
+        }
+        ordreVitrine.forEach(name => {
+            if (!products[name]) {
+                products[name] = { vitrine: 0, stock: 0, rupture: true };
             }
-        }));
+        });
+        saveData();
     }
 
     function saveData() {
-        const data = {};
-        categories.forEach(cat => cat.products.forEach(p => {
-            data[p.name] = { vitrine: p.vitrine, stock: p.stock };
-        }));
-        localStorage.setItem('boissons_v2', JSON.stringify(data));
-        showToast('✅ Sauvegardé !');
+        localStorage.setItem("boissons_v5", JSON.stringify(products));
     }
 
-    function resetAll() {
-        if (!confirm('Remettre toutes les quantités à 0 ?')) return;
-        categories.forEach(cat => cat.products.forEach(p => {
-            p.vitrine = 0; p.stock = 0; p.rupture = true;
-        }));
-        renderBothTables();
-        updateStats();
-        showToast('🔄 Réinitialisé !');
-    }
-
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2500);
-    }
-
-    // ─── ONGLETS ─────────────────────────────────────────────────────────────
-    function switchTab(tab, btn) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
-        btn.classList.add('active');
-    }
-
-    // ─── STATS ────────────────────────────────────────────────────────────────
     function updateStats() {
-        let total = 0, rupture = 0, dispo = 0;
-        categories.forEach(cat => cat.products.forEach(p => {
-            total++;
-            p.rupture ? rupture++ : dispo++;
-        }));
-        document.getElementById('stat-total').textContent   = total;
-        document.getElementById('stat-rupture').textContent = rupture;
-        document.getElementById('stat-dispo').textContent   = dispo;
+        const all = Object.values(products);
+        const ruptures = all.filter(p => p.rupture).length;
+        document.getElementById("stat-total").textContent   = all.length;
+        document.getElementById("stat-rupture").textContent = ruptures;
+        document.getElementById("stat-dispo").textContent   = all.length - ruptures;
+    }
+
+    function refreshBadges(name) {
+        const p = products[name];
+        document.querySelectorAll(`.badge[data-name="${name}"]`).forEach(b => {
+            b.className = "badge " + (p.rupture ? "rupture" : "dispo");
+            b.textContent = p.rupture ? "Rupture" : "Disponible";
+        });
+        saveData();
+    }
+
+    // ─── TABS ─────────────────────────────────────────────────────────────────
+
+    function switchTab(tab) {
+        document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById("panel-" + tab).classList.add("active");
+        document.getElementById("tab-" + tab).classList.add("active");
     }
 
     // ─── FILTRES ──────────────────────────────────────────────────────────────
+
     function setFilter(tab, filter, btn) {
-        filters[tab] = filter;
-        const container = document.getElementById('tab-' + tab);
-        container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        document.getElementById("tab-" + tab).dataset.filter = filter;
+        btn.closest(".filter-btns").querySelectorAll(".filter-btn")
+            .forEach(b => b.classList.remove("active-filter"));
+        btn.classList.add("active-filter");
         applyFilter(tab);
     }
 
     function applyFilter(tab) {
-        const search  = document.getElementById('search-' + tab).value.toLowerCase();
-        const filter  = filters[tab];
-        const tbody   = document.getElementById('tbody-' + tab);
-        const rows    = tbody.querySelectorAll('tr');
+        const filter  = document.getElementById("tab-" + tab).dataset.filter || "all";
+        const search  = document.getElementById("search-" + tab).value.toLowerCase();
+        const tbody   = document.getElementById("tbody-" + tab);
+        const field   = tab === "vitrine" ? "vitrine" : "stock";
 
-        let lastCatRow = null;
-        let lastCatHasVisible = false;
-
-        rows.forEach(row => {
-            if (row.classList.contains('category-row')) {
-                if (lastCatRow) lastCatRow.style.display = lastCatHasVisible ? '' : 'none';
-                lastCatRow = row;
-                lastCatHasVisible = false;
-                return;
-            }
-            const name      = (row.dataset.name || '').toLowerCase();
-            const isRupture = row.dataset.rupture === 'true';
-            let visible = true;
-            if (search && !name.includes(search)) visible = false;
-            if (filter === 'rupture' && !isRupture)  visible = false;
-            if (filter === 'dispo'   && isRupture)   visible = false;
-            row.style.display = visible ? '' : 'none';
-            if (visible) lastCatHasVisible = true;
+        tbody.querySelectorAll("tr:not(.category-row)").forEach(tr => {
+            const name = tr.dataset.name;
+            if (!name) return;
+            const p = products[name];
+            const matchSearch = name.toLowerCase().includes(search);
+            const matchFilter = filter === "all"
+                || (filter === "rupture" && p.rupture)
+                || (filter === "dispo" && !p.rupture);
+            tr.style.display = (matchSearch && matchFilter) ? "" : "none";
         });
-        if (lastCatRow) lastCatRow.style.display = lastCatHasVisible ? '' : 'none';
-    }
 
-    // ─── BADGE ID ─────────────────────────────────────────────────────────────
-    function badgeId(name, tab) {
-        return `badge-${tab}-${name.replace(/\s+/g,'-').replace(/[^a-zA-Z0-9-]/g,'')}`;
-    }
-
-    // ─── MISE À JOUR BADGE ────────────────────────────────────────────────────
-    function refreshBadges(p) {
-        ['vitrine','stock'].forEach(tab => {
-            const el = document.getElementById(badgeId(p.name, tab));
-            if (!el) return;
-            el.className = `badge ${p.rupture ? 'rupture' : 'dispo'}`;
-            el.textContent = p.rupture ? 'Rupture' : 'Disponible';
-        });
-        // Mettre à jour data-rupture sur les lignes des deux tableaux
-        ['vitrine','stock'].forEach(tab => {
-            const tbody = document.getElementById('tbody-' + tab);
-            tbody.querySelectorAll(`tr[data-name="${p.name}"]`).forEach(tr => {
-                tr.dataset.rupture = p.rupture ? 'true' : 'false';
+        if (tab === "stock") {
+            tbody.querySelectorAll("tr.category-row").forEach(catRow => {
+                let next = catRow.nextElementSibling;
+                let hasVisible = false;
+                while (next && !next.classList.contains("category-row")) {
+                    if (next.style.display !== "none") hasVisible = true;
+                    next = next.nextElementSibling;
+                }
+                catRow.style.display = hasVisible ? "" : "none";
             });
-        });
+        }
     }
 
-    // ─── RENDER ───────────────────────────────────────────────────────────────
+    // ─── RESET ────────────────────────────────────────────────────────────────
+
+    function resetAll() {
+        if (!confirm("Remettre toutes les quantités à zéro ?")) return;
+        Object.keys(products).forEach(name => {
+            products[name].vitrine = 0;
+            products[name].stock   = 0;
+            products[name].rupture = true;
+        });
+        saveData();
+        renderBothTables();
+    }
+
+    // ─── RENDU ────────────────────────────────────────────────────────────────
+
+    function makeRow(name, tab) {
+        const p     = products[name];
+        const field = tab === "vitrine" ? "vitrine" : "stock";
+        const tr    = document.createElement("tr");
+        tr.dataset.name = name;
+
+        const tdName = document.createElement("td");
+        tdName.className = "name-col";
+        tdName.textContent = name;
+
+        const tdQty = document.createElement("td");
+        const ctrl  = document.createElement("div");
+        ctrl.className = "qty-control";
+
+        const btnMinus = document.createElement("button");
+        btnMinus.className = "qty-btn";
+        btnMinus.textContent = "−";
+
+        const input = document.createElement("input");
+        input.type      = "number";
+        input.className = "qty-input";
+        input.value     = p[field];
+        input.min       = "0";
+
+        if (tab === "vitrine") vitrineInputsList.push(input);
+        else                   stockInputsList.push(input);
+
+        const btnPlus = document.createElement("button");
+        btnPlus.className = "qty-btn";
+        btnPlus.textContent = "+";
+
+        ctrl.appendChild(btnMinus);
+        ctrl.appendChild(input);
+        ctrl.appendChild(btnPlus);
+        tdQty.appendChild(ctrl);
+
+        const tdBadge  = document.createElement("td");
+        const badge    = document.createElement("span");
+        badge.className = "badge " + (p.rupture ? "rupture" : "dispo");
+        badge.textContent = p.rupture ? "Rupture" : "Disponible";
+        badge.dataset.name = name;
+        tdBadge.appendChild(badge);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdQty);
+        tr.appendChild(tdBadge);
+
+        const list = tab === "vitrine" ? vitrineInputsList : stockInputsList;
+
+        btnMinus.addEventListener("click", () => {
+            if (p[field] > 0) p[field]--;
+            input.value = p[field];
+            p.rupture = p[field] <= 0;
+            refreshBadges(name);
+            updateStats();
+        });
+
+        btnPlus.addEventListener("click", () => {
+            p[field]++;
+            input.value = p[field];
+            p.rupture = p[field] <= 0;
+            refreshBadges(name);
+            updateStats();
+        });
+
+        input.addEventListener("change", () => {
+            const v = parseInt(input.value) || 0;
+            p[field]  = v < 0 ? 0 : v;
+            input.value = p[field];
+            p.rupture = p[field] <= 0;
+            refreshBadges(name);
+            updateStats();
+        });
+
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") focusNext(list, input);
+        });
+
+        input.addEventListener("focus", () => input.select());
+
+        return tr;
+    }
+
     function renderBothTables() {
         vitrineInputsList = [];
         stockInputsList   = [];
 
-        const tbodyV = document.getElementById('tbody-vitrine');
-        const tbodyS = document.getElementById('tbody-stock');
-        tbodyV.innerHTML = '';
-        tbodyS.innerHTML = '';
+        const tbodyV = document.getElementById("tbody-vitrine");
+        const tbodyS = document.getElementById("tbody-stock");
+        tbodyV.innerHTML = "";
+        tbodyS.innerHTML = "";
 
-        categories.forEach(cat => {
-            // Ligne catégorie vitrine
-            const catV = document.createElement('tr');
-            catV.classList.add('category-row');
-            catV.innerHTML = `<td colspan="3">📦 ${cat.name}</td>`;
-            tbodyV.appendChild(catV);
+        ordreVitrine.forEach(name => {
+            tbodyV.appendChild(makeRow(name, "vitrine"));
+        });
 
-            // Ligne catégorie stock
-            const catS = document.createElement('tr');
-            catS.classList.add('category-row');
-            catS.innerHTML = `<td colspan="3">📦 ${cat.name}</td>`;
-            tbodyS.appendChild(catS);
-
-            cat.products.forEach(p => {
-                const rupClass  = p.rupture ? 'rupture' : 'dispo';
-                const rupText   = p.rupture ? 'Rupture' : 'Disponible';
-
-                // ── Ligne VITRINE ──
-                const trV = document.createElement('tr');
-                trV.dataset.name    = p.name;
-                trV.dataset.rupture = p.rupture ? 'true' : 'false';
-                trV.innerHTML = `
-                    <td>${p.name}</td>
-                    <td><input type="number" class="qty-input vitrine-input" value="${p.vitrine}" min="0" inputmode="numeric"></td>
-                    <td><span class="badge ${rupClass}" id="${badgeId(p.name,'vitrine')}">${rupText}</span></td>
-                `;
-                tbodyV.appendChild(trV);
-
-                // ── Ligne STOCK ──
-                const trS = document.createElement('tr');
-                trS.dataset.name    = p.name;
-                trS.dataset.rupture = p.rupture ? 'true' : 'false';
-                trS.innerHTML = `
-                    <td>${p.name}</td>
-                    <td><input type="number" class="qty-input stock-input" value="${p.stock}" min="0" inputmode="numeric"></td>
-                    <td><span class="badge ${rupClass}" id="${badgeId(p.name,'stock')}">${rupText}</span></td>
-                `;
-                tbodyS.appendChild(trS);
-
-                const vitrineInput = trV.querySelector('.vitrine-input');
-                const stockInput   = trS.querySelector('.stock-input');
-
-                vitrineInputsList.push(vitrineInput);
-                stockInputsList.push(stockInput);
-
-                // ── Événements VITRINE ──
-                vitrineInput.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = Math.max(0, parseInt(vitrineInput.value) || 0);
-                        vitrineInput.value = val;
-                        p.vitrine = val;
-                        focusNext(vitrineInputsList, vitrineInput);
-                    }
-                });
-                vitrineInput.addEventListener('change', () => {
-                    p.vitrine = Math.max(0, parseInt(vitrineInput.value) || 0);
-                    vitrineInput.value = p.vitrine;
-                });
-                vitrineInput.addEventListener('focus', () => vitrineInput.select());
-
-                // ── Événements STOCK ──
-                stockInput.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = Math.max(0, parseInt(stockInput.value) || 0);
-                        stockInput.value = val;
-                        p.stock   = val;
-                        p.rupture = val <= 0;
-                        refreshBadges(p);
-                        updateStats();
-                        focusNext(stockInputsList, stockInput);
-                    }
-                });
-                stockInput.addEventListener('change', () => {
-                    p.stock   = Math.max(0, parseInt(stockInput.value) || 0);
-                    stockInput.value = p.stock;
-                    p.rupture = p.stock <= 0;
-                    refreshBadges(p);
-                    updateStats();
-                });
-                stockInput.addEventListener('focus', () => stockInput.select());
+        categoriesStock.forEach(cat => {
+            const catRow = document.createElement("tr");
+            catRow.classList.add("category-row");
+            catRow.innerHTML = `<td colspan="3">📦 ${cat.name}</td>`;
+            tbodyS.appendChild(catRow);
+            cat.products.forEach(name => {
+                tbodyS.appendChild(makeRow(name, "stock"));
             });
         });
 
-        applyFilter('vitrine');
-        applyFilter('stock');
+        document.getElementById("tab-vitrine").dataset.filter = "all";
+        document.getElementById("tab-stock").dataset.filter   = "all";
+        applyFilter("vitrine");
+        applyFilter("stock");
         updateStats();
     }
 
-    // ─── NAVIGATION ──────────────────────────────────────────────────────────
     function focusNext(list, current) {
         const idx = list.indexOf(current);
         for (let i = idx + 1; i < list.length; i++) {
             const next = list[i];
-            if (next.closest('tr').style.display !== 'none') {
+            if (next.closest("tr").style.display !== "none") {
                 next.focus();
                 next.select();
                 break;
@@ -770,12 +592,11 @@
         }
     }
 
-    // ─── INIT ─────────────────────────────────────────────────────────────────
     loadData();
     renderBothTables();
 
-    document.getElementById('search-vitrine').addEventListener('input', () => applyFilter('vitrine'));
-    document.getElementById('search-stock').addEventListener('input',   () => applyFilter('stock'));
+    document.getElementById("search-vitrine").addEventListener("input", () => applyFilter("vitrine"));
+    document.getElementById("search-stock").addEventListener("input",   () => applyFilter("stock"));
 </script>
 
 </body>
